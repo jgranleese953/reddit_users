@@ -1,20 +1,18 @@
 package com.example.redditusers.users
 
 import com.example.redditusers.MainDispatcherRule
-import com.example.redditusers.model.User
 import com.example.redditusers.model.UserDetails
-import com.example.redditusers.utils.UIState
+import com.example.redditusers.ui.utils.UIState
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
-import io.mockk.spyk
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -30,47 +28,58 @@ class UsersViewModelTest {
     @MockK
     private lateinit var usersRepository: UsersRepository
 
-    lateinit var usersViewModel: UsersViewModel
+    private lateinit var usersViewModel: UsersViewModel
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-
-        usersViewModel = spyk(UsersViewModel(usersRepository))
+        usersViewModel = UsersViewModel(usersRepository)
     }
 
     @Test
     fun `test initial state`() = runTest {
-        advanceUntilIdle()
-
         assertTrue(usersViewModel.uiState.value is UIState.Loading)
     }
 
     @Test
-    fun `test make api call success`() = runTest {
-        val users = mockk<User>()
-        val items = mockk<List<UserDetails>>()
+    fun `test get users success`() = runTest {
+        val users = listOf(mockk<UserDetails>())
+        val flow = flow { emit(users) }
 
-        coEvery { usersRepository.getUsers() } returns users
-        every { users.items } returns items
+        every { usersRepository.state } returns flow
 
         usersViewModel.getUsers()
         advanceUntilIdle()
 
-        assertEquals(items, (usersViewModel.uiState.value as UIState.Success).result)
+        val currentState = usersViewModel.uiState.value
+        assertEquals((currentState as UIState.Success).result, users)
     }
 
     @Test
-    fun `test make api call failure`() = runTest {
-        val localisedMessage = "message"
-        val exception = mockk<Exception>()
+    fun `test get users failure`() = runTest {
+        val errorMessage = "error"
+        val flow = flow<List<UserDetails>> { throw Exception(errorMessage) }
 
-        coEvery { usersRepository.getUsers() } throws exception
-        every { exception.localizedMessage } returns localisedMessage
+        every { usersRepository.state } returns flow
 
         usersViewModel.getUsers()
         advanceUntilIdle()
 
-        assertEquals(localisedMessage, (usersViewModel.uiState.value as UIState.Error).message)
+        val currentState = usersViewModel.uiState.value
+        assertTrue(currentState is UIState.Error)
+        assertEquals((currentState as UIState.Error).message, errorMessage)
+    }
+
+    @Test
+    fun `test toggleFavourite calls repository`() = runTest {
+        val userId = "userId"
+        val isSelected = true
+
+        coEvery { usersRepository.toggleFavourite(userId, isSelected) } returns Unit
+
+        usersViewModel.toggleFavourite(userId, isSelected)
+        advanceUntilIdle()
+
+        coVerify { usersRepository.toggleFavourite(userId, isSelected) }
     }
 }

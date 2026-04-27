@@ -1,5 +1,7 @@
 package com.example.redditusers.di
 
+import android.content.Context
+import androidx.room.Room
 import com.example.redditusers.api.APIService
 import com.example.redditusers.utils.Utils
 import dagger.Module

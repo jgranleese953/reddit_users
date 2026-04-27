@@ -1,6 +1,8 @@
 package com.example.redditusers.model
 
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.Serializable
 
@@ -30,7 +32,7 @@ data class UserDetails(
     @SerializedName("link")
     val link: String,
     @SerializedName("location")
-    val location: String,
+    val location: String?,
     @SerializedName("profile_image")
     val profileImage: String,
     @SerializedName("reputation")
@@ -46,11 +48,12 @@ data class UserDetails(
     @SerializedName("reputation_change_year")
     val reputationChangeYear: Int,
     @SerializedName("user_id")
-    val userId: Int,
+    val userId: String,
     @SerializedName("user_type")
     val userType: String,
     @SerializedName("website_url")
-    val websiteUrl: String
+    val websiteUrl: String,
+    val isFollowed: Boolean = false
 )
 
 data class BadgeCounts(
@@ -60,4 +63,10 @@ data class BadgeCounts(
     val gold: Int,
     @SerializedName("silver")
     val silver: Int
+)
+
+@Entity(tableName = "followed_users_table")
+data class FollowedUser(
+    @PrimaryKey
+    var userId: String
 )
