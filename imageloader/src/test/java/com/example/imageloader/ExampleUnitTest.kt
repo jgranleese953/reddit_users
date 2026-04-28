@@ -1,4 +1,4 @@
-package com.example.redditusers
+package com.example.imageloader
 
 import org.junit.Test
 

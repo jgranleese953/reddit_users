@@ -51,7 +51,7 @@ class UsersRepositoryTest {
 
     @Test
     fun `test users`() = runTest {
-        usersRepository.users.collect {
+        usersRepository.users().collect {
             assertEquals(users, it)
         }
     }

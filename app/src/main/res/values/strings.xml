@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">Reddit Users</string>
+    <string name="name_title">Name: %1$s</string>
+    <string name="reputation_title">Reputation: %1$s</string>
+    <string name="no_results_found_message">No results found</string>
+    <string name="error_message">An unexpected error had occurred.</string>
+
+    <!--Accessibility-->
+    <string name="profile_pic_content_description">%1$s\'s profile photo</string>
+    <string name="follow_content_description">Click to follow %1$s</string>
+    <string name="unfollow_content_description">Click to unfollow %1$s</string>
+
 </resources>

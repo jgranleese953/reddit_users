@@ -24,4 +24,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Reddit Users"
 include(":app")
- 
+include(":imageloader")
